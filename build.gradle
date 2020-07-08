@@ -53,11 +53,6 @@ pmd {
     reportsDir = file("build/reports/pmd")
 }
 
-task copyExtensions(type: Copy) {
-    from configurations.extension.files
-    into 'build/extensions/'
-}
-
 bootRepackage {
     enabled = false
 }
