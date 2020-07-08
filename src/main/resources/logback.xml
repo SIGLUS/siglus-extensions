@@ -1,0 +1,20 @@
+<configuration>
+  <include resource="org/springframework/boot/logging/logback/base.xml" />
+
+  <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+    <layout class="ch.qos.logback.classic.PatternLayout">
+      <Pattern>
+        %d{yyy-MM-dd HH:mm:ss} %highlight(%-5level) --- %magenta([%thread]) %logger{36}.%M:%L - %msg%n
+      </Pattern>
+    </layout>
+  </appender>
+
+  <logger name="org.openlmis.*" level="DEBUG" additivity="false">
+    <appender-ref ref="CONSOLE"/>
+  </logger>
+
+  <!-- Define the root logger log level -->
+  <root level="INFO">
+    <appender-ref ref="CONSOLE"/>
+  </root>
+</configuration>
