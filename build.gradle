@@ -25,7 +25,13 @@ buildscript {
 
 repositories {
     mavenCentral()
-    maven { url "http://localhost:8082/repository/maven-public/" }
+    maven {
+        url "http://jenkins.siglus.us:8082/repository/maven-public/"
+        credentials {
+            username siglusMavenUser
+            password siglusMavenPassword
+        }
+    }
 }
 
 configurations {
