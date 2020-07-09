@@ -18,7 +18,6 @@ package org.openlmis.stockmanagement.extension;
 import static java.util.stream.Collectors.summingInt;
 import static org.openlmis.stockmanagement.i18n.MessageKeys.ERROR_EVENT_CANNOT_UNPACK_CONSTITUENT_NOT_ACCOUNTED_FOR;
 import static org.openlmis.stockmanagement.i18n.MessageKeys.ERROR_EVENT_CANNOT_UNPACK_REGULAR_ORDERABLE;
-import static org.openlmis.stockmanagement.i18n.MessageKeys.ERROR_EVENT_CANNOT_UNPACK_WHEN_EXTRA_CONSTITUENTS_CREDITED;
 import static org.springframework.util.CollectionUtils.isEmpty;
 
 import java.util.List;
@@ -89,10 +88,13 @@ public class SiglusUnpackKitValidator implements StockEventValidator {
         .forEach(line -> validateUnpackedKit(line, orderables.get(line.getOrderableId()),
             nonUnpackQuantities));
 
-    if (nonUnpackQuantities.values().stream().anyMatch(i -> i > 0)) {
-      throw new ValidationMessageException(
-          new Message(ERROR_EVENT_CANNOT_UNPACK_WHEN_EXTRA_CONSTITUENTS_CREDITED));
-    }
+    // [SIGLUS change start]
+    // [change reason]: quantity can be inconsistent when unpack.
+    // if (nonUnpackQuantities.values().stream().anyMatch(i -> i > 0)) {
+    //   throw new ValidationMessageException(
+    //       new Message(ERROR_EVENT_CANNOT_UNPACK_WHEN_EXTRA_CONSTITUENTS_CREDITED));
+    // }
+    // [SIGLUS change end]
 
     profiler.stop().log();
     XLOGGER.exit(stockEventDto);
@@ -108,8 +110,11 @@ public class SiglusUnpackKitValidator implements StockEventValidator {
     }
 
     // check if the constituent products are all accounted for.
-    orderable.getChildren().forEach(
-        orderableChild -> validateKitConstituents(lineItem, orderableCredits, orderableChild));
+    // [SIGLUS change start]
+    // [change reason]: quantity can be inconsistent when unpack.
+    // orderable.getChildren().forEach(
+    //     orderableChild -> validateKitConstituents(lineItem, orderableCredits, orderableChild));
+    // [SIGLUS change end]
 
   }
 

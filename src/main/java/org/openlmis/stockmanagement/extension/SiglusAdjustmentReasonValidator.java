@@ -18,6 +18,7 @@ package org.openlmis.stockmanagement.extension;
 import static org.openlmis.stockmanagement.i18n.MessageKeys.ERROR_EVENT_ADJUSTMENT_REASON_CATEGORY_INVALID;
 import static org.openlmis.stockmanagement.i18n.MessageKeys.ERROR_EVENT_ADJUSTMENT_REASON_TYPE_INVALID;
 
+import java.util.UUID;
 import org.openlmis.stockmanagement.domain.reason.StockCardLineItemReason;
 import org.openlmis.stockmanagement.dto.StockEventDto;
 import org.openlmis.stockmanagement.dto.StockEventLineItemDto;
@@ -25,6 +26,7 @@ import org.openlmis.stockmanagement.exception.ValidationMessageException;
 import org.openlmis.stockmanagement.util.Message;
 import org.openlmis.stockmanagement.validators.StockEventValidator;
 import org.slf4j.profiler.Profiler;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
@@ -34,6 +36,12 @@ import org.springframework.stereotype.Component;
 @Component(value = "SiglusAdjustmentReasonValidator")
 public class SiglusAdjustmentReasonValidator implements StockEventValidator {
 
+  // [SIGLUS change start]
+  // [change reason]: add isUnpackingFromKit check.
+  @Value("${stockmanagement.kit.unpacked.from.reasonId}")
+  private UUID unpackedFromReasonId;
+  // [SIGLUS change end]
+
   @Override
   public void validate(StockEventDto stockEventDto) {
     XLOGGER.entry(stockEventDto);
@@ -41,7 +49,12 @@ public class SiglusAdjustmentReasonValidator implements StockEventValidator {
     profiler.setLogger(XLOGGER);
 
     boolean hasSourceOrDestination = stockEventDto.hasSource() || stockEventDto.hasDestination();
-    if (hasSourceOrDestination || !stockEventDto.hasLineItems() || stockEventDto.isKitUnpacking()) {
+
+    // [SIGLUS change start]
+    // [change reason]: add isUnpackingFromKit check.
+    if (hasSourceOrDestination || !stockEventDto.hasLineItems() || stockEventDto.isKitUnpacking()
+        || isUnpackingFromKit(stockEventDto)) {
+      // [SIGLUS change end]
       return;
     }
 
@@ -54,6 +67,16 @@ public class SiglusAdjustmentReasonValidator implements StockEventValidator {
     profiler.stop().log();
     XLOGGER.exit(stockEventDto);
   }
+
+  // [SIGLUS change start]
+  // [change reason]: add isUnpackingFromKit check.
+  private boolean isUnpackingFromKit(StockEventDto stockEventDto) {
+    return stockEventDto.hasLineItems()
+      && stockEventDto.getLineItems()
+      .stream()
+      .anyMatch(l -> unpackedFromReasonId.equals(l.getReasonId()));
+  }
+  // [SIGLUS change end]
 
   private void validateReason(StockEventDto event, StockEventLineItemDto lineItem,
       Profiler profiler) {
