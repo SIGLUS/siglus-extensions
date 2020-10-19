@@ -5,12 +5,13 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath "org.springframework.boot:spring-boot-gradle-plugin:1.5.9.RELEASE"
+        classpath "org.springframework.boot:spring-boot-gradle-plugin:2.2.2.RELEASE"
     }
 }
 
 apply plugin: 'java'
-apply plugin: 'spring-boot'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
 apply plugin: 'checkstyle'
 apply plugin: 'jacoco'
 apply plugin: 'pmd'
@@ -45,7 +46,7 @@ dependencies {
 }
 
 checkstyle {
-    toolVersion = "7.1"
+    toolVersion = "8.12"
 }
 
 pmd {
@@ -56,6 +57,10 @@ pmd {
     reportsDir = file("build/reports/pmd")
 }
 
-bootRepackage {
+jar {
+    enabled = true
+}
+
+bootJar {
     enabled = false
 }
